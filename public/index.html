@@ -19,6 +19,7 @@
     <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">☰</button>
     <nav id="main-nav">
       <a href="#events">Events</a><a href="#about">About</a><a href="#contact">Contact</a>
+      <button class="button button-outline theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">☾ Dark mode</button>
       <button class="button button-outline" id="student-nav-action" data-open="login">Student login</button>
       <button class="button button-primary" id="admin-nav-action" data-open="admin-login">Admin</button>
     </nav>
@@ -46,9 +47,15 @@
     <section class="events-section section-wrap" id="events">
       <div class="section-heading">
         <div><span class="eyebrow">YOUR CAMPUS, IN MOTION</span><h2>Find your next <span>thing.</span></h2></div>
-        <div class="filters" id="category-filters">
-          <button class="filter active" data-category="All">All events</button><button class="filter" data-category="Technical">Technical</button>
-          <button class="filter" data-category="Cultural">Cultural</button><button class="filter" data-category="Sports">Sports</button><button class="filter" data-category="Workshops">Workshops</button>
+        <div class="event-controls">
+          <label class="event-search">
+            <span aria-hidden="true">⌕</span>
+            <input id="event-search" type="search" placeholder="Search events by name or category" aria-label="Search events by name or category">
+          </label>
+          <div class="filters" id="category-filters">
+            <button class="filter active" data-category="All">All events</button><button class="filter" data-category="Technical">Technical</button>
+            <button class="filter" data-category="Cultural">Cultural</button><button class="filter" data-category="Sports">Sports</button><button class="filter" data-category="Workshops">Workshops</button>
+          </div>
         </div>
       </div>
       <div id="events-grid" class="events-grid"><div class="empty-state">Loading upcoming events…</div></div>

@@ -1,9 +1,20 @@
-const state = { user: null, events: [], category: 'All', dashboard: null, studentRegistrations: [], pendingEventId: null };
+const state = { user: null, events: [], category: 'All', search: '', dashboard: null, studentRegistrations: [], pendingEventId: null };
 const grid = document.getElementById('events-grid');
 const backdrop = document.getElementById('modal-backdrop');
 const modalContent = document.getElementById('modal-content');
 const toast = document.getElementById('toast');
 let toastTimer;
+
+function setTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark-theme', isDark);
+  const button = document.getElementById('theme-toggle');
+  button.textContent = isDark ? '☀ Light mode' : '☾ Dark mode';
+  button.setAttribute('aria-label', `Switch to ${isDark ? 'light' : 'dark'} theme`);
+  button.setAttribute('aria-pressed', String(isDark));
+}
+
+setTheme(localStorage.getItem('college-event-theme') || 'light');
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
@@ -56,9 +67,14 @@ async function loadEvents() {
 }
 
 function renderEvents() {
-  const events = state.category === 'All' ? state.events : state.events.filter(event => event.category === state.category);
+  const search = state.search.trim().toLocaleLowerCase();
+  const events = state.events.filter(event => {
+    const matchesCategory = state.category === 'All' || event.category === state.category;
+    const matchesSearch = !search || event.name.toLocaleLowerCase().includes(search) || event.category.toLocaleLowerCase().includes(search);
+    return matchesCategory && matchesSearch;
+  });
   if (!events.length) {
-    grid.innerHTML = '<div class="empty-state">No upcoming events in this category just yet. Check back soon.</div>';
+    grid.innerHTML = '<div class="empty-state">No events match your search. Try another name or category.</div>';
     return;
   }
   grid.innerHTML = events.map(event => `
@@ -136,12 +152,14 @@ function eventForm(event = null) {
 function studentDashboard(tab = 'events') {
   const isRegistered = tab === 'registered';
   const list = isRegistered ? state.studentRegistrations : state.events;
+  const registeredCategories = new Set(state.studentRegistrations.map(item => item.category)).size;
   const items = list.length ? list.map(item => `<article class="dashboard-item"><div>
     <h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.category)} · ${formatDate(item.date)} at ${escapeHtml(item.time)} · ${escapeHtml(item.venue)}</p>
     ${isRegistered ? `<p class="registration-code">Registration ID: ${escapeHtml(item.registrationId)}</p>` : ''}
     </div>${isRegistered ? '' : `<button class="event-register" data-register="${item.id}">Register →</button>`}</article>`).join('') :
     `<div class="empty-state">${isRegistered ? 'You have not registered for an event yet.' : 'No upcoming events are available.'}</div>`;
   showModal(`<div class="dashboard-header"><div><span class="eyebrow">STUDENT DASHBOARD</span><h2 id="modal-title">Hi, ${escapeHtml(state.user.name.split(' ')[0])}.</h2><span class="dashboard-user">${escapeHtml(state.user.email)}</span></div><button class="button button-outline" data-logout>Log out</button></div>
+    <div class="stats-grid"><div class="stat-box"><strong>${state.events.length}</strong><span>AVAILABLE EVENTS</span></div><div class="stat-box"><strong>${state.studentRegistrations.length}</strong><span>MY REGISTRATIONS</span></div><div class="stat-box"><strong>${registeredCategories}</strong><span>CATEGORIES JOINED</span></div></div>
     <div class="dashboard-tabs"><button class="dash-tab ${!isRegistered ? 'active' : ''}" data-student-tab="events">Available events</button><button class="dash-tab ${isRegistered ? 'active' : ''}" data-student-tab="registered">My registrations (${state.studentRegistrations.length})</button></div>
     <div class="dashboard-list">${items}</div>`);
 }
@@ -216,6 +234,10 @@ document.addEventListener('click', async event => {
   if (target.matches('[data-open]')) {
     event.preventDefault();
     authForm(target.dataset.open);
+  } else if (target.id === 'theme-toggle') {
+    const theme = document.body.classList.contains('dark-theme') ? 'light' : 'dark';
+    setTheme(theme);
+    localStorage.setItem('college-event-theme', theme);
   } else if (target.hasAttribute('data-dashboard')) {
     await openDashboard();
   } else if (target.id === 'modal-close' || target === backdrop) {
@@ -279,6 +301,11 @@ document.addEventListener('click', async event => {
   } else if (target.closest('#main-nav') && target.matches('a')) {
     document.getElementById('main-nav').classList.remove('open');
   }
+});
+
+document.getElementById('event-search').addEventListener('input', event => {
+  state.search = event.target.value;
+  renderEvents();
 });
 
 document.addEventListener('submit', async event => {
