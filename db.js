@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const initializeSqlJs = require('sql.js');
+const seedEvents = require('./seed-events');
 
 const databasePath = path.join(__dirname, 'event_registration.db');
 const wasmDirectory = path.dirname(require.resolve('sql.js'));
@@ -40,6 +41,7 @@ const databaseReady = initializeSqlJs({
       event_time TEXT NOT NULL,
       venue TEXT NOT NULL,
       category TEXT NOT NULL CHECK (category IN ('Technical', 'Cultural', 'Sports', 'Workshops')),
+      capacity INTEGER NOT NULL DEFAULT 50 CHECK (capacity > 0),
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -55,6 +57,39 @@ const databaseReady = initializeSqlJs({
     );
   `);
 
+  const eventColumns = database.exec('PRAGMA table_info(events)')[0].values;
+  if (!eventColumns.some(column => column[1] === 'capacity')) {
+    database.run('ALTER TABLE events ADD COLUMN capacity INTEGER NOT NULL DEFAULT 50 CHECK (capacity > 0)');
+  }
+
+  database.exec(`
+    CREATE TRIGGER IF NOT EXISTS enforce_event_capacity
+    BEFORE INSERT ON registrations
+    WHEN (SELECT COUNT(*) FROM registrations WHERE event_id = NEW.event_id) >=
+      (SELECT capacity FROM events WHERE id = NEW.event_id)
+    BEGIN
+      SELECT RAISE(ABORT, 'EVENT_CAPACITY_REACHED');
+    END;
+  `);
+
+  const eventCount = database.exec('SELECT COUNT(*) FROM events')[0].values[0][0];
+  if (Number(eventCount) === 0) {
+    const insertEvent = database.prepare(
+      'INSERT INTO events (name, description, event_date, event_time, venue, category, capacity) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    );
+    try {
+      for (const [name, description, daysAhead, venue, category, capacity] of seedEvents) {
+        const date = new Date();
+        date.setDate(date.getDate() + daysAhead);
+        const eventDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        insertEvent.run([name, description, eventDate, '10:00', venue, category, capacity]);
+      }
+    } finally {
+      insertEvent.free();
+    }
+  }
+
+  fs.writeFileSync(databasePath, Buffer.from(database.export()));
   return database;
 });
 
@@ -80,6 +115,7 @@ async function execute(sql, params = []) {
     return [result];
   } catch (error) {
     if (/UNIQUE constraint failed/i.test(error.message)) error.code = 'SQLITE_CONSTRAINT_UNIQUE';
+    if (error.message.includes('EVENT_CAPACITY_REACHED')) error.code = 'SQLITE_CONSTRAINT_EVENT_CAPACITY';
     throw error;
   } finally {
     statement.free();
@@ -88,5 +124,6 @@ async function execute(sql, params = []) {
 
 module.exports = {
   execute,
-  query: execute
+  query: execute,
+  isPostgres: false
 };

@@ -79,11 +79,11 @@ function renderEvents() {
   }
   grid.innerHTML = events.map(event => `
     <article class="event-card">
-      <div class="event-top"><span class="event-category">${escapeHtml(event.category)}</span><span class="event-count">${Number(event.registration_count)} registered</span></div>
+      <div class="event-top"><span class="event-category">${escapeHtml(event.category)}</span><span class="event-count">${Number(event.registration_count)} / ${Number(event.capacity)} registered</span></div>
       <h3>${escapeHtml(event.name)}</h3><p>${escapeHtml(event.description)}</p>
       <div class="event-meta"><span>◷ &nbsp;${formatDate(event.date)} · ${escapeHtml(event.time)}</span><span>⌖ &nbsp;${escapeHtml(event.venue)}</span></div>
-      <div class="event-footer"><span class="event-date">${escapeHtml(event.category.toUpperCase())} · CAMPUS EVENT</span>
-      <button class="event-register" data-register="${event.id}">Register now →</button></div>
+      <div class="event-footer"><span class="event-date">${Number(event.seats_remaining)} spots left</span>
+      <button class="event-register" data-register="${event.id}" ${Number(event.seats_remaining) === 0 ? 'disabled' : ''}>${Number(event.seats_remaining) === 0 ? 'Event full' : 'Register now →'}</button></div>
     </article>`).join('');
 }
 
@@ -141,6 +141,7 @@ function eventForm(event = null) {
         <div class="form-field"><label for="date">Date</label><input id="date" name="date" type="date" required value="${value('date')}"></div>
         <div class="form-field"><label for="time">Time</label><input id="time" name="time" type="time" required value="${value('time')}"></div>
         <div class="form-field"><label for="venue">Venue</label><input id="venue" name="venue" required value="${value('venue')}"></div>
+        <div class="form-field"><label for="capacity">Attendee limit</label><input id="capacity" name="capacity" type="number" min="1" max="10000" required value="${value('capacity') || '100'}"></div>
         <div class="form-field"><label for="category">Category</label><select id="category" name="category" required>
           ${['Technical', 'Cultural', 'Sports', 'Workshops'].map(category => `<option ${event?.category === category ? 'selected' : ''}>${category}</option>`).join('')}
         </select></div>
@@ -194,7 +195,7 @@ async function completeEventRegistration(eventId) {
 
 function adminDashboard(tab = 'events', search = '') {
   const { stats, registrations } = state.dashboard;
-  const eventItems = state.events.length ? state.events.map(event => `<article class="dashboard-item"><div><h3>${escapeHtml(event.name)}</h3><p>${escapeHtml(event.category)} · ${formatDate(event.date)} at ${escapeHtml(event.time)} · ${escapeHtml(event.venue)}</p></div><div><button class="small-action" data-edit="${event.id}">Edit</button><button class="small-action danger" data-delete="${event.id}">Delete</button></div></article>`).join('') : '<div class="empty-state">No events yet. Add your first campus event.</div>';
+  const eventItems = state.events.length ? state.events.map(event => `<article class="dashboard-item"><div><h3>${escapeHtml(event.name)}</h3><p>${escapeHtml(event.category)} · ${formatDate(event.date)} at ${escapeHtml(event.time)} · ${escapeHtml(event.venue)} · ${Number(event.registration_count)} / ${Number(event.capacity)} registered</p></div><div><button class="small-action" data-edit="${event.id}">Edit</button><button class="small-action danger" data-delete="${event.id}">Delete</button></div></article>`).join('') : '<div class="empty-state">No events yet. Add your first campus event.</div>';
   const query = search.trim().toLowerCase();
   const filtered = registrations.filter(row => row.studentName.toLowerCase().includes(query) || row.usn.toLowerCase().includes(query));
   const registrationRows = filtered.length ? filtered.map(row => `<tr><td>${escapeHtml(row.studentName)}</td><td>${escapeHtml(row.usn)}</td><td>${escapeHtml(row.department)}</td><td>${escapeHtml(row.eventName)}</td><td>${escapeHtml(row.date)}</td><td>${escapeHtml(row.registrationId.slice(0, 8))}</td></tr>`).join('') : '<tr><td colspan="6">No matching registrations.</td></tr>';

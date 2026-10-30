@@ -508,6 +508,10 @@ a {
 .event-register:hover {
   background: #315c9f;
 }
+.event-register:disabled {
+  cursor: not-allowed;
+  background: #8a94a5;
+}
 .empty-state {
   grid-column: 1/-1;
   text-align: center;
