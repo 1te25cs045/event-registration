@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102a56">
+  <title>Northstar College | Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Northstar College home">
+      <span class="brand-mark">N</span><span>Northstar <small>COLLEGE</small></span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">☰</button>
+    <nav id="main-nav">
+      <a href="#events">Events</a><a href="#about">About</a><a href="#contact">Contact</a>
+      <button class="button button-outline" id="student-nav-action" data-open="login">Student login</button>
+      <button class="button button-primary" id="admin-nav-action" data-open="admin-login">Admin</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <span class="eyebrow"><span class="live-dot"></span> CAMPUS LIFE, ALL IN ONE PLACE</span>
+        <h1>Make your next<br><span>moment matter.</span></h1>
+        <p>Find your people, try something new, and make memories that last. Your next campus experience starts here.</p>
+        <div class="hero-actions"><a class="button button-primary button-large" href="#events">Explore events <span>→</span></a><button class="button button-light button-large" data-open="signup">Join the community</button></div>
+        <div class="hero-note"><span class="avatar-stack"><i>✦</i><i>✧</i><i>★</i></span><span>One campus. Countless ways to belong.</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <div class="art-sun">✦</div><div class="art-card card-top"><span>✦</span><small>CREATE</small></div>
+        <div class="art-card card-bottom"><span>↗</span><small>CONNECT</small></div>
+        <div class="art-center"><div class="center-circle"><span>N</span><small>YOUR CAMPUS<br>YOUR MOMENT</small></div></div>
+        <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✦</span>
+      </div>
+      <div class="hero-bottom"><span>THINK BIGGER</span><span>FIND YOUR PEOPLE</span><span>MAKE IT HAPPEN</span><span>SCROLL TO EXPLORE ↓</span></div>
+    </section>
+
+    <section class="events-section section-wrap" id="events">
+      <div class="section-heading">
+        <div><span class="eyebrow">YOUR CAMPUS, IN MOTION</span><h2>Find your next <span>thing.</span></h2></div>
+        <div class="filters" id="category-filters">
+          <button class="filter active" data-category="All">All events</button><button class="filter" data-category="Technical">Technical</button>
+          <button class="filter" data-category="Cultural">Cultural</button><button class="filter" data-category="Sports">Sports</button><button class="filter" data-category="Workshops">Workshops</button>
+        </div>
+      </div>
+      <div id="events-grid" class="events-grid"><div class="empty-state">Loading upcoming events…</div></div>
+    </section>
+
+    <section class="about-section" id="about">
+      <div class="about-visual"><span class="about-star">✳</span><span class="about-year">EST. 1998<br>ALWAYS MOVING FORWARD</span><div class="about-orbit"></div><div class="about-number">01<span>/04</span></div></div>
+      <div class="about-copy"><span class="eyebrow">MORE THAN A CLASSROOM</span><h2>Big ideas.<br><span>Better together.</span></h2>
+        <p>At Northstar College, the best learning happens everywhere — on stage, on the field, in the lab, and in the conversations that stay with you. Find an event that sparks something and make it yours.</p>
+        <a class="text-link" href="#events">See what's happening <span>→</span></a>
+        <div class="about-stats"><div><strong>25+</strong><span>STUDENT CLUBS</span></div><div><strong>100+</strong><span>EVENTS A YEAR</span></div><div><strong>1</strong><span>YOU, UNLIMITED</span></div></div>
+      </div>
+    </section>
+
+    <section class="contact-section section-wrap" id="contact">
+      <div><span class="eyebrow">LET'S MAKE IT HAPPEN</span><h2>Have a question?<br><span>We're all ears.</span></h2></div>
+      <div class="contact-card"><span class="contact-icon">✉</span><p>For event support or to learn more about campus life, get in touch with our student engagement team.</p><a href="mailto:events@northstar.edu">events@northstar.edu <span>↗</span></a><small>STUDENT ENGAGEMENT OFFICE · MON–FRI, 9 AM–5 PM</small></div>
+    </section>
+  </main>
+  <footer><a class="brand footer-brand" href="#home"><span class="brand-mark">N</span><span>Northstar <small>COLLEGE</small></span></a><span>© 2026 NORTHSTAR COLLEGE · MADE FOR WHAT'S NEXT</span><a href="#home">BACK TO TOP ↑</a></footer>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Close dialog">×</button>
+      <div id="modal-content"></div>
+    </section>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

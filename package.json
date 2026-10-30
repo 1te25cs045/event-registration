@@ -1,0 +1,17 @@
+{
+  "name": "college-event-registration",
+  "version": "1.0.0",
+  "description": "College event registration system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "sql.js": "^1.13.0"
+  }
+}

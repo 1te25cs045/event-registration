@@ -1,0 +1,5 @@
+node_modules/
+.env
+event_registration.db
+event_registration.db-*
+npm-debug.log*
