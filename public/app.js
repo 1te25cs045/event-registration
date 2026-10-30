@@ -357,7 +357,7 @@ async function initialize() {
     const result = await api('/api/me');
     state.user = result.user;
     updateNavigation();
-    if (state.user) openDashboard();
+    if (state.user) await openDashboard();
   } catch (error) {
     console.error(error);
   }
